@@ -61,7 +61,7 @@ public class StudentController {
     @GetMapping("/students/delete/{id}")
     public String deleteStd(@PathVariable("id") Long id){
         repo.deleteStd(id);
-        return "redirect:/Students";
+        return "redirect:/students";
     }
     
  
@@ -80,7 +80,7 @@ public class StudentController {
         
         repo.saveStd(std);
         
-        return "redirect:/Students";
+        return "redirect:/students";
     }
 
 
