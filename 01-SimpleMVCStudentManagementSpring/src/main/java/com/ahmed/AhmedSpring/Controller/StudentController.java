@@ -6,13 +6,10 @@ import com.ahmed.AhmedSpring.entities.Student;
 import com.ahmed.AhmedSpring.service.StdServiceImpl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class StudentController {
@@ -23,13 +20,29 @@ public class StudentController {
       public StudentController(StdServiceImpl repo){
           this.repo=repo;
       }
-    
-    @GetMapping("/Students")
-    public String getStudent(Model m){
-        List<Student> list=repo.findAll();
-        m.addAttribute("listStds",list);
+
+
+
+    @GetMapping("/students")
+    public String getStudents(
+            Model model,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDirection
+    ) {
+        Page<Student> studentPage = repo.findStudentsWithPaginationAndSorting(page, size, sortField, sortDirection);
+
+        model.addAttribute("listStds", studentPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", studentPage.getTotalPages());
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("reverseSortDir", sortDirection.equals("asc") ? "desc" : "asc");
+
         return "student-page";
     }
+
     @GetMapping("/create")
     public String newOne(Model m){
         Student s=new Student();
@@ -69,5 +82,7 @@ public class StudentController {
         
         return "redirect:/Students";
     }
+
+
     
 }
